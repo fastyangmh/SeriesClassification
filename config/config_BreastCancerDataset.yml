@@ -2,3 +2,37 @@
 mode: train
 root: data/
 predefined_dataset: BreastCancerDataset
+classes: ["malignant", "benign"]
+max_samples: null
+batch_size: 32
+num_workers: 0
+device: cuda
+
+# transforms configuration
+transforms_config:
+  train: null
+
+  val: null
+
+  test: null
+
+  predict: null
+
+# target transforms configuration
+target_transforms_config:
+  train:
+    LabelSmoothing:
+      alpha: 0.2
+      num_classes: null
+
+  val:
+    OneHotEncoder:
+      num_classes: null
+
+  test:
+    OneHotEncoder:
+      num_classes: null
+
+  predict:
+    OneHotEncoder:
+      num_classes: null
