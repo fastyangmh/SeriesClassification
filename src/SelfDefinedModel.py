@@ -8,12 +8,12 @@ class SelfDefinedModel(nn.Module):
     def __init__(self, in_features, num_classes) -> None:
         super().__init__()
         layers = []
-        for idx in range(4):
+        for idx in range(3):
             out_features = in_features * 4
             layers.append(
                 nn.Linear(in_features=in_features, out_features=out_features))
             layers.append(nn.GLU())
-            layers.append(nn.Dropout(p=0.25))
+            layers.append(nn.Dropout(p=0.1))
             in_features = out_features // 2
         layers.append(
             nn.Linear(in_features=in_features, out_features=num_classes))
