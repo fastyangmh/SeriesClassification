@@ -12,6 +12,13 @@ model_name: src/SelfDefinedModel.py
 in_features: 30
 loss_function_name: BCEWithLogitsLoss
 checkpoint_path: null
+seed: 0
+early_stopping: True
+patience: 3
+default_root_dir: save/
+gpus: 1
+precision: 32
+max_epochs: 100
 
 # transforms configuration
 transforms_config:
@@ -26,8 +33,7 @@ transforms_config:
 # target transforms configuration
 target_transforms_config:
   train:
-    LabelSmoothing:
-      alpha: 0.2
+    OneHotEncoder:
       num_classes: null
 
   val:
