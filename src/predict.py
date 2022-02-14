@@ -25,11 +25,30 @@ class Predict:
         self.num_workers = project_parameters.num_workers
         self.classes = project_parameters.classes
         self.loader = pd.read_csv
+        self.in_features = project_parameters.in_features
 
-    def predict(self, filepath) -> Any:
+    def predict(self, inputs) -> Any:
         result = []
-        if type(filepath) == list:
-            sample = torch.tensor(filepath).float()
+        #check inputs whether is filepath
+        try:
+            condition = isfile(inputs)
+        except:
+            condition = isfile(path=','.join(inputs))
+        if not condition:
+            #expect the inputs is a list in which each element is a numeric string
+            #examples: ['0', '0', '0']
+            formatted_inputs = []
+            for v in inputs:
+                try:
+                    v = float(v)
+                    formatted_inputs.append(v)
+                except:
+                    print(f'the input data exist non-digital!\ndata: {v}')
+            if len(formatted_inputs) != self.in_features:
+                print(
+                    f'the length of input data is invalid.\nplease check the input data.\ndata: {inputs}'
+                )
+            sample = torch.tensor(formatted_inputs).float()
             if self.transform is not None:
                 sample = self.transform(sample)
             sample = sample[None]
@@ -37,8 +56,8 @@ class Predict:
                 sample = sample.cuda()
             with torch.no_grad():
                 result.append(self.model(sample).tolist()[0])
-        elif isfile(path=filepath):
-            dataset = SeriesPredictDataset(filepath=filepath,
+        elif isfile(path=inputs):
+            dataset = SeriesPredictDataset(filepath=inputs,
                                            loader=self.loader,
                                            transform=self.transform)
             pin_memory = True if self.device == 'cuda' and torch.cuda.is_available(
@@ -54,8 +73,7 @@ class Predict:
                         sample = sample.cuda()
                     result.append(self.model(sample).tolist())
         else:
-            assert 0, 'please check the filepath.\nfilepath: {}'.format(
-                filepath)
+            assert 0, 'please check the filepath.\nfilepath: {}'.format(inputs)
         result = np.concatenate(result, 0)
         print(', '.join(self.classes))
         print(result)
@@ -68,4 +86,4 @@ if __name__ == '__main__':
 
     # predict file
     result = Predict(project_parameters=project_parameters).predict(
-        filepath=project_parameters.root)
+        inputs=project_parameters.root)
