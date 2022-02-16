@@ -7,17 +7,10 @@ import torch.nn as nn
 class SelfDefinedModel(nn.Module):
     def __init__(self, in_features, num_classes) -> None:
         super().__init__()
-        layers = []
-        for idx in range(3):
-            out_features = in_features * 4
-            layers.append(
-                nn.Linear(in_features=in_features, out_features=out_features))
-            layers.append(nn.GLU())
-            layers.append(nn.Dropout(p=0.1))
-            in_features = out_features // 2
-        layers.append(
-            nn.Linear(in_features=in_features, out_features=num_classes))
-        self.model = nn.Sequential(*layers)
+        self.model = nn.Sequential(
+            nn.Linear(in_features=in_features, out_features=in_features * 4),
+            nn.BatchNorm1d(num_features=in_features * 4), nn.GLU(),
+            nn.Linear(in_features=in_features * 2, out_features=num_classes))
 
     def forward(self, x):
         return self.model(x)
